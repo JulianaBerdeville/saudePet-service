@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "SaudePet",
+    "slug": "saudepet",
+    "version": "1.0.0",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTabletOnly": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.saudepet.app"
+    },
+    "extra": {
+      "API_URL": "http://192.168.0.22:4000"
+    },
+    "plugins": ["expo-secure-store"]
+  }
+}
+

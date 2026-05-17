@@ -1,0 +1,39 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: saudepet-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: saudepet
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - saudepet-network
+
+  api:
+    build: .
+    container_name: saudepet-api
+    ports:
+      - "4000:4000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/saudepet
+      JWT_SECRET: 'dev-secret-please-change'
+      PORT: 4000
+      NODE_ENV: development
+      CORS_ORIGIN: http://localhost:19000,http://localhost:8081
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - saudepet-network
+
+volumes:
+  mongo_data:
+
+networks:
+  saudepet-network:
+    driver: bridge
