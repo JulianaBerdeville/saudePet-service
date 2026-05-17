@@ -23,8 +23,8 @@ const eventSchema = new mongoose.Schema(
     vaccine: {
       name: { type: String, trim: true, maxlength: 20 },
       manufactureDate: {
-        type: String,
-        match: [/^\d{4}-(0[1-9]|1[0-2])$/, 'data do fabricante deve seguir formato AAAA-MM'],
+        year: { type: Number, min: 1900, max: new Date().getFullYear() },
+        month: { type: Number, min: 1, max: 12 },
       },
       part: { type: String, trim: true },
       serialNumber: { type: String, trim: true },

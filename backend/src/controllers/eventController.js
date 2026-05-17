@@ -30,12 +30,34 @@ const createEvent = async (req, res, next) => {
       if (name.length > 20) {
         return res.status(400).json({ error: 'nome da vacina deve ter no máximo 20 caracteres' });
       }
-      if (!manufactureDate || !manufactureDate.trim()) {
+
+      let manuObj = null;
+      if (!manufactureDate) {
         return res.status(400).json({ error: 'data de fabricação é obrigatória' });
       }
-      const mdRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
-      if (!mdRegex.test(manufactureDate)) {
-        return res.status(400).json({ error: 'data de fabricação deve estar no formato YYYY-MM' });
+      if (typeof manufactureDate === 'string') {
+        const mdRegex = /^\s*(\d{4})-(0[1-9]|1[0-2])\s*$/;
+        const m = manufactureDate.match(mdRegex);
+        if (!m) {
+          return res.status(400).json({ error: 'data de fabricação deve estar no formato YYYY-MM' });
+        }
+        manuObj = { year: parseInt(m[1], 10), month: parseInt(m[2], 10) };
+      } else if (typeof manufactureDate === 'object') {
+        const { year, month } = manufactureDate;
+        if (!year || !month) {
+          return res.status(400).json({ error: 'manufactureDate deve ter year e month' });
+        }
+        manuObj = { year: Number(year), month: Number(month) };
+      } else {
+        return res.status(400).json({ error: 'formato de manufactureDate inválido' });
+      }
+
+      const currentYear = new Date().getFullYear();
+      if (manuObj.year < 1900 || manuObj.year > currentYear) {
+        return res.status(400).json({ error: 'ano de fabricação inválido' });
+      }
+      if (manuObj.month < 1 || manuObj.month > 12) {
+        return res.status(400).json({ error: 'mês de fabricação inválido' });
       }
 
       if (applicationDate) {
@@ -48,7 +70,7 @@ const createEvent = async (req, res, next) => {
 
       eventData.vaccine = {
         ...vaccine,
-        manufactureDate: manufactureDate,
+        manufactureDate: manuObj,
       };
     }
 
@@ -137,13 +159,36 @@ const updateEvent = async (req, res, next) => {
       if (name.length > 20) {
         return res.status(400).json({ error: 'nome da vacina deve ter no máximo 20 caracteres' });
       }
-      if (!manufactureDate || !manufactureDate.trim()) {
+
+      let manuObj = null;
+      if (!manufactureDate) {
         return res.status(400).json({ error: 'data de fabricação é obrigatória' });
       }
-      const mdRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
-      if (!mdRegex.test(manufactureDate)) {
-        return res.status(400).json({ error: 'data de fabricação deve estar no formato YYYY-MM' });
+      if (typeof manufactureDate === 'string') {
+        const mdRegex = /^\s*(\d{4})-(0[1-9]|1[0-2])\s*$/;
+        const m = manufactureDate.match(mdRegex);
+        if (!m) {
+          return res.status(400).json({ error: 'data de fabricação deve estar no formato YYYY-MM' });
+        }
+        manuObj = { year: parseInt(m[1], 10), month: parseInt(m[2], 10) };
+      } else if (typeof manufactureDate === 'object') {
+        const { year, month } = manufactureDate;
+        if (!year || !month) {
+          return res.status(400).json({ error: 'manufactureDate deve ter year e month' });
+        }
+        manuObj = { year: Number(year), month: Number(month) };
+      } else {
+        return res.status(400).json({ error: 'formato de manufactureDate inválido' });
       }
+
+      const currentYear = new Date().getFullYear();
+      if (manuObj.year < 1900 || manuObj.year > currentYear) {
+        return res.status(400).json({ error: 'ano de fabricação inválido' });
+      }
+      if (manuObj.month < 1 || manuObj.month > 12) {
+        return res.status(400).json({ error: 'mês de fabricação inválido' });
+      }
+
       if (applicationDate) {
         const ad = new Date(applicationDate);
         if (isNaN(ad.getTime())) {
@@ -154,7 +199,7 @@ const updateEvent = async (req, res, next) => {
 
       event.vaccine = {
         ...vaccine,
-        manufactureDate: manufactureDate,
+        manufactureDate: manuObj,
       };
     } else if (type !== 'vacina') {
       event.vaccine = undefined;

@@ -26,12 +26,12 @@ const EventFormScreen = ({ navigation, route }) => {
   const [isTypeModalVisible, setTypeModalVisible] = useState(false);
   const [notes, setNotes] = useState(eventData?.notes || '');
   const [type, setType] = useState(eventData?.type || 'outro');
-  const [vaccineApplied, setVaccineApplied] = useState(
+  const [isVaccineApplied, setIsVaccineApplied] = useState(
     eventData?.type === 'vacina' && eventData.vaccine?.applicationDate ? true : false
   );
   const [vaccine, setVaccine] = useState({
     name: eventData?.vaccine?.name || '',
-    manufactureDate: eventData?.vaccine?.manufactureDate || '',
+    manufactureDate: eventData?.vaccine?.manufactureDate || null,
     part: eventData?.vaccine?.part || '',
     serialNumber: eventData?.vaccine?.serialNumber || '',
     applicationDate: eventData?.vaccine?.applicationDate
@@ -56,8 +56,7 @@ const EventFormScreen = ({ navigation, route }) => {
       return;
     }
 
-    // If type is vacina and user indicates it was applied, validate vaccine fields
-    if (type === 'vacina' && vaccineApplied) {
+    if (type === 'vacina' && isVaccineApplied) {
       if (!vaccine.name || !vaccine.name.trim()) {
         Alert.alert('Erro', "nome da vacina é obrigatório");
         return;
@@ -66,13 +65,32 @@ const EventFormScreen = ({ navigation, route }) => {
         Alert.alert('Erro', 'nome da vacina deve ter no máximo 20 caracteres');
         return;
       }
-      if (!vaccine.manufactureDate || !vaccine.manufactureDate.trim()) {
+      if (!vaccine.manufactureDate) {
         Alert.alert('Erro', 'data de fabricação é obrigatória');
         return;
       }
-      const mdRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
-      if (!mdRegex.test(vaccine.manufactureDate)) {
-        Alert.alert('Erro', 'data de fabricação deve estar no formato YYYY-MM');
+      let manufactureYear;
+      let manufactureMonth;
+      if (typeof vaccine.manufactureDate === 'string') {
+        const mdRegex = /^\s*(\d{4})-(0[1-9]|1[0-2])\s*$/;
+        const m = vaccine.manufactureDate.match(mdRegex);
+        if (!m) {
+          Alert.alert('Erro', 'data de fabricação deve estar no formato YYYY-MM');
+          return;
+        }
+        manufactureYear = parseInt(m[1], 10);
+        manufactureMonth = parseInt(m[2], 10);
+      } else {
+        manufactureYear = Number(vaccine.manufactureDate.year);
+        manufactureMonth = Number(vaccine.manufactureDate.month);
+      }
+      const cy = new Date().getFullYear();
+      if (!manufactureYear || manufactureYear < 1900 || manufactureYear > cy) {
+        Alert.alert('Erro', 'ano de fabricação inválido');
+        return;
+      }
+      if (!manufactureMonth || manufactureMonth < 1 || manufactureMonth > 12) {
+        Alert.alert('Erro', 'mês de fabricação inválido');
         return;
       }
       if (!vaccine.applicationDate || !vaccine.applicationDate.trim()) {
@@ -89,7 +107,7 @@ const EventFormScreen = ({ navigation, route }) => {
           notes,
           type,
         };
-        if (type === 'vacina' && vaccineApplied) {
+        if (type === 'vacina' && isVaccineApplied) {
           payload.vaccine = {
             ...vaccine,
             applicationDate: new Date(vaccine.applicationDate).toISOString(),
@@ -104,7 +122,7 @@ const EventFormScreen = ({ navigation, route }) => {
           notes,
           type,
         };
-        if (type === 'vacina' && vaccineApplied) {
+        if (type === 'vacina' && isVaccineApplied) {
           payload.vaccine = {
             ...vaccine,
             applicationDate: new Date(vaccine.applicationDate).toISOString(),
@@ -231,22 +249,22 @@ const EventFormScreen = ({ navigation, route }) => {
             <Text style={styles.label}>Vacina aplicada?</Text>
             <View style={{ flexDirection: 'row', marginBottom: 8 }}>
               <TouchableOpacity
-                style={[styles.smallOption, vaccineApplied && styles.smallOptionActive]}
-                onPress={() => setVaccineApplied(true)}
+                style={[styles.smallOption, isVaccineApplied && styles.smallOptionActive]}
+                onPress={() => setIsVaccineApplied(true)}
                 disabled={isLoading}
               >
-                <Text style={{ color: vaccineApplied ? '#fff' : '#333' }}>Sim</Text>
+                <Text style={{ color: isVaccineApplied ? '#fff' : '#333' }}>Sim</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.smallOption, !vaccineApplied && styles.smallOptionActive, { marginLeft: 8 }]}
-                onPress={() => setVaccineApplied(false)}
+                style={[styles.smallOption, !isVaccineApplied && styles.smallOptionActive, { marginLeft: 8 }]}
+                onPress={() => setIsVaccineApplied(false)}
                 disabled={isLoading}
               >
-                <Text style={{ color: !vaccineApplied ? '#fff' : '#333' }}>Não</Text>
+                <Text style={{ color: !isVaccineApplied ? '#fff' : '#333' }}>Não</Text>
               </TouchableOpacity>
             </View>
 
-            {vaccineApplied && (
+            {isVaccineApplied && (
               <>
                 <Text style={styles.label}>nome da vacina</Text>
                 <TextInput
@@ -257,27 +275,40 @@ const EventFormScreen = ({ navigation, route }) => {
                   editable={!isLoading}
                 />
 
-                <Text style={styles.label}>data de fabricação (AAAA-MM)</Text>
+                <Text style={styles.label}>data de fabricação</Text>
                 <TouchableOpacity
                   style={[styles.input, { justifyContent: 'center' }]}
                   onPress={() => setManufactureMonthPickerVisible(true)}
                   disabled={isLoading}
                 >
                   <Text style={{ color: vaccine.manufactureDate ? '#333' : '#999' }}>
-                    {vaccine.manufactureDate ? vaccine.manufactureDate : 'Selecionar mês'}
+                    {vaccine.manufactureDate
+                      ? typeof vaccine.manufactureDate === 'string'
+                        ? vaccine.manufactureDate
+                        : `${vaccine.manufactureDate.year}-${String(vaccine.manufactureDate.month).padStart(2, '0')}`
+                      : 'Selecionar mês'}
                   </Text>
                 </TouchableOpacity>
 
                 <DateTimePickerModal
                   isVisible={isManufactureMonthPickerVisible}
                   mode="date"
-                  // show a reasonable default
-                  date={vaccine.manufactureDate ? new Date(vaccine.manufactureDate + '-01') : new Date()}
+                  date={(() => {
+                    try {
+                      if (!vaccine.manufactureDate) return new Date();
+                      if (typeof vaccine.manufactureDate === 'string') {
+                        const parts = vaccine.manufactureDate.split('-');
+                        return new Date(`${parts[0]}-${parts[1]}-01`);
+                      }
+                      return new Date(`${vaccine.manufactureDate.year}-${String(vaccine.manufactureDate.month).padStart(2,'0')}-01`);
+                    } catch (e) {
+                      return new Date();
+                    }
+                  })()}
                   onConfirm={(dt) => {
                     const y = dt.getFullYear();
-                    const m = String(dt.getMonth() + 1).padStart(2, '0');
-                    const ym = `${y}-${m}`;
-                    setVaccine((s) => ({ ...s, manufactureDate: ym }));
+                    const m = dt.getMonth() + 1;
+                    setVaccine((s) => ({ ...s, manufactureDate: { year: y, month: m } }));
                     setManufactureMonthPickerVisible(false);
                   }}
                   onCancel={() => setManufactureMonthPickerVisible(false)}

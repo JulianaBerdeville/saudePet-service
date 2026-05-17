@@ -64,13 +64,11 @@ const login = async (req, res, next) => {
       return res.status(401).json({ error: 'usuário não encontrado' });
     }
 
-    // Comparar senha
     const isPasswordValid = await compare(password, user.passwordHash);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'usuário ou senha incorretos' });
     }
 
-    // Gerar token
     const token = generateToken(user._id);
 
     res.status(200).json({
