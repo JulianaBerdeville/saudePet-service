@@ -130,8 +130,7 @@ const PetDetailsScreen = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#82B1B7',
-" />
+        <ActivityIndicator size="large" color="#82B1B7" />
       </View>
     );
   }
