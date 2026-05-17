@@ -1,6 +1,6 @@
 # SaúdePet - Service
 
-Aplicação criada para atender à disciplina de Projeto Integrador em Ciência de Dados da Universidade Virtual do Estado de São Paulo. (PI III Turma 10).
+Aplicação criada para atender à disciplina de Projeto Integrador em Ciência de Dados da Universidade Virtual do Estado de São Paulo. (PI III Turma 4).
 Esta é uma aplicação monorepo contendo o backend (API REST em Node/Express) e o frontend mobile (React Native / Expo) para gestão da saúde de pets.
 
 ## Visão geral
