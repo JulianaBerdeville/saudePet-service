@@ -84,11 +84,6 @@ npm start
 expo start
 ```
 
-## Testes
-
-- Backend: Jest + Supertest (comandos em `backend/package.json`)
-- Lint: ESLint configurado no backend
-
 ## Contribuição
 
 - Para rodar localmente com containers:
