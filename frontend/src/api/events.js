@@ -1,6 +1,5 @@
 import client from './client';
 
-// Accept a data object (may include vaccine subobject) and post to /events
 export const createEvent = async (data) => {
   const response = await client.post('/events', data);
   return response.data;

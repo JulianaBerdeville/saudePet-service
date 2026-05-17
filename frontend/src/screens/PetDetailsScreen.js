@@ -10,18 +10,28 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { getEvents, deleteEvent } from '../api/events';
+import { getPetById } from '../api/pets';
+import { deletePet as apiDeletePet } from '../api/pets';
 
 const PetDetailsScreen = ({ route, navigation }) => {
   const { petId } = route.params;
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [pet, setPet] = useState(null);
 
   const loadEvents = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await getEvents({ petId });
       setEvents(data.events || []);
+      try {
+        const petData = await getPetById(petId);
+        setPet(petData.pet || null);
+      } catch (e) {
+        Alert.alert('Ops', 'houve um erro por aqui.');
+
+      }
     } catch (error) {
       Alert.alert('Erro', 'falha ao carregar eventos');
     } finally {
@@ -46,7 +56,7 @@ const PetDetailsScreen = ({ route, navigation }) => {
       'confirmar',
       'deseja mesmo apagar o evento?',
       [
-        { text: 'cancelar', onPress: () => {} },
+        { text: 'cancelar', onPress: () => { } },
         {
           text: 'apagar',
           onPress: async () => {
@@ -94,6 +104,29 @@ const PetDetailsScreen = ({ route, navigation }) => {
     </TouchableOpacity>
   );
 
+  const handleDeletePet = useCallback(() => {
+    Alert.alert(
+      'confirmar',
+      'deseja mesmo apagar este pet? todos os eventos relacionados serão apagados',
+      [
+        { text: 'cancelar', onPress: () => { } },
+        {
+          text: 'apagar',
+          onPress: async () => {
+            try {
+              await apiDeletePet(petId);
+              Alert.alert('sucesso', 'pet apagado');
+              navigation.navigate('Home', { refresh: true });
+            } catch (error) {
+              Alert.alert('erro', 'falha ao apagar o pet');
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  }, [petId, navigation]);
+
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
@@ -106,12 +139,18 @@ const PetDetailsScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>eventos</Text>
+        <Text style={styles.title}>{pet ? pet.name : 'eventos'}</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('EventForm', { petId })}
         >
-          <Text style={styles.addButtonText}> novo</Text>
+          <Text style={styles.addButtonText}> adicionar evento</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDeletePet}
+        >
+          <Text style={styles.deleteButtonText}> apagar pet </Text>
         </TouchableOpacity>
       </View>
 
@@ -174,6 +213,17 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
+    fontWeight: '600',
+  },
+  deleteButton: {
+    borderWidth: 1,
+    borderColor: '#82B1B7',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: '#82B1B7',
     fontWeight: '600',
   },
   listContent: {

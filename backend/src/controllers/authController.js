@@ -21,14 +21,14 @@ const register = async (req, res, next) => {
     //   return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres' });
     // }
 
-  const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'Este email já está registrado' });
     }
 
     const hashedPassword = await hash(password, 10);
 
-  const newUser = await User.create({
+    const newUser = await User.create({
       name,
       email,
       passwordHash: hashedPassword,
@@ -58,7 +58,7 @@ const login = async (req, res, next) => {
       return res.status(400).json({ error: 'email e senha são obrigatórios' });
     }
 
-  const user = await User.findOne({ email }).select('+passwordHash');
+    const user = await User.findOne({ email }).select('+passwordHash');
 
     if (!user || !user.active) {
       return res.status(401).json({ error: 'usuário não encontrado' });
@@ -93,7 +93,7 @@ const deactivateAccount = async (req, res, next) => {
   try {
     const userId = req.user._id;
 
-  const user = await User.findByIdAndUpdate(userId, { active: false }, { new: true });
+    const user = await User.findByIdAndUpdate(userId, { active: false }, { new: true });
 
     res.status(200).json({
       message: 'conta desativada',
@@ -111,7 +111,7 @@ const deactivateAccount = async (req, res, next) => {
 
 const getCurrentUser = async (req, res, next) => {
   try {
-  const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id);
     res.status(200).json({
       user: {
         id: user._id,

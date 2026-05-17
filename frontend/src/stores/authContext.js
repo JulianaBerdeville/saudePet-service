@@ -62,41 +62,41 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = await SecureStore.getItemAsync('authToken');
         if (token) {
-            setApiToken(token);
-            try {
-              const { getCurrentUser } = require('../api/auth');
-              const res = await getCurrentUser();
-              const user = res?.user || null;
+          setApiToken(token);
+          try {
+            const { getCurrentUser } = require('../api/auth');
+            const res = await getCurrentUser();
+            const user = res?.user || null;
+            dispatch({
+              type: 'RESTORE_TOKEN',
+              payload: {
+                token,
+                user,
+              },
+            });
+          } catch (err) {
+            const status = err.response?.status;
+            if (status === 401 || status === 403) {
+              await SecureStore.deleteItemAsync('authToken');
+              clearApiToken();
+              dispatch({
+                type: 'RESTORE_TOKEN',
+                payload: {
+                  token: null,
+                  user: null,
+                },
+              });
+            } else {
+              console.warn('não foi possível buscar dados do usuário:', err);
               dispatch({
                 type: 'RESTORE_TOKEN',
                 payload: {
                   token,
-                  user,
+                  user: null,
                 },
               });
-            } catch (err) {
-              const status = err.response?.status;
-              if (status === 401 || status === 403) {
-                await SecureStore.deleteItemAsync('authToken');
-                clearApiToken();
-                dispatch({
-                  type: 'RESTORE_TOKEN',
-                  payload: {
-                    token: null,
-                    user: null,
-                  },
-                });
-              } else {
-                console.warn('não foi possível buscar dados do usuário:', err);
-                dispatch({
-                  type: 'RESTORE_TOKEN',
-                  payload: {
-                    token,
-                    user: null,
-                  },
-                });
-              }
             }
+          }
         } else {
           dispatch({
             type: 'RESTORE_TOKEN',

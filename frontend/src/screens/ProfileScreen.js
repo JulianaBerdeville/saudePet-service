@@ -18,7 +18,7 @@ const ProfileScreen = () => {
       'confirmar',
       'quer mesmo sair?',
       [
-        { text: 'cancelar', onPress: () => {} },
+        { text: 'cancelar', onPress: () => { } },
         {
           text: 'sair',
           onPress: async () => {
@@ -38,7 +38,7 @@ const ProfileScreen = () => {
       'desativar conta',
       'desativaremos sua conta e manteremos seus dados seguros',
       [
-        { text: 'cancelar', onPress: () => {} },
+        { text: 'cancelar', onPress: () => { } },
         {
           text: 'desativar',
           onPress: async () => {

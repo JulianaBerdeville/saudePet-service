@@ -11,19 +11,19 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from './Styles';
 
 
-const EventsGrid = ({ navigation, pets, events, isLoadingEvents = false, onDeleteEvent }) => {
+const EventsGrid = ({ navigation, pets, events, isLoadingEvents = false }) => {
   const navHook = useNavigation();
   const nav = navigation || navHook;
 
   const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-}
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }
 
   const listData = [{ __create: true }, ...(events || [])];
 
@@ -31,7 +31,7 @@ const EventsGrid = ({ navigation, pets, events, isLoadingEvents = false, onDelet
     <View style={styles.eventsSection}>
       {isLoadingEvents ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="small" color="#007AFF" />
+          <ActivityIndicator size="small" color="#82B1B7" />
         </View>
       ) : events.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -46,9 +46,8 @@ const EventsGrid = ({ navigation, pets, events, isLoadingEvents = false, onDelet
               <TouchableOpacity
                 style={styles.eventCard}
                 onPress={() => {
-                  // Prefer to open the form for the first pet if available
                   if (!pets || pets.length === 0) {
-                    Alert.alert('Atenção', 'Nenhum pet cadastrado. Adicione um pet primeiro.');
+                    Alert.alert('Ops', 'nenhum pet por aqui. Adicione um pet.');
                     return;
                   }
                   nav.navigate('EventForm', { petId: pets[0]._id });

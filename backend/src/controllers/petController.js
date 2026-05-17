@@ -8,12 +8,12 @@ const createPet = async (req, res, next) => {
       return res.status(400).json({ error: 'nome do pet é obrigatório' });
     }
 
-  const pet = await Pet.create({
+    const pet = await Pet.create({
       owner: req.user._id,
       name,
       breed,
       dob: dob ? new Date(dob) : undefined,
-       notes,
+      notes,
     });
 
     res.status(201).json({
@@ -27,7 +27,7 @@ const createPet = async (req, res, next) => {
 
 const getPets = async (req, res, next) => {
   try {
-  const pets = await Pet.find({ owner: req.user._id }).sort({ createdAt: -1 });
+    const pets = await Pet.find({ owner: req.user._id }).sort({ createdAt: -1 });
 
     res.status(200).json({
       count: pets.length,
@@ -42,7 +42,7 @@ const getPetById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-  const pet = await Pet.findOne({ _id: id, owner: req.user._id });
+    const pet = await Pet.findOne({ _id: id, owner: req.user._id });
 
     if (!pet) {
       return res.status(404).json({ error: 'pet não encontrado' });
@@ -59,7 +59,7 @@ const updatePet = async (req, res, next) => {
     const { id } = req.params;
     const { name, breed, dob, notes } = req.body;
 
-  const pet = await Pet.findOne({ _id: id, owner: req.user._id });
+    const pet = await Pet.findOne({ _id: id, owner: req.user._id });
 
     if (!pet) {
       return res.status(404).json({ error: 'pet não encontrado' });
@@ -85,13 +85,13 @@ const deletePet = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-  const pet = await Pet.findOne({ _id: id, owner: req.user._id });
+    const pet = await Pet.findOne({ _id: id, owner: req.user._id });
 
     if (!pet) {
       return res.status(404).json({ error: 'pet não encontrado' });
     }
 
-  await Pet.deleteOne({ _id: id });
+    await Pet.deleteOne({ _id: id });
 
     const Event = require('../models/Event');
     await Event.deleteMany({ pet: id });

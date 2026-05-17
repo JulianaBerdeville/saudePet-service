@@ -9,12 +9,12 @@ export const getBaseURL = () => {
   if (__DEV__) {
     const localhost = Platform.select({
       android: 'http://10.0.2.2:4000',
-      
+
       ios: 'http://localhost:4000',
-      
+
       web: 'http://localhost:4000',
-      
-  default: 'http://localhost:4000',
+
+      default: 'http://localhost:4000',
     });
     return localhost;
   }

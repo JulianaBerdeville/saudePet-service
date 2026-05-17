@@ -300,7 +300,7 @@ const EventFormScreen = ({ navigation, route }) => {
                         const parts = vaccine.manufactureDate.split('-');
                         return new Date(`${parts[0]}-${parts[1]}-01`);
                       }
-                      return new Date(`${vaccine.manufactureDate.year}-${String(vaccine.manufactureDate.month).padStart(2,'0')}-01`);
+                      return new Date(`${vaccine.manufactureDate.year}-${String(vaccine.manufactureDate.month).padStart(2, '0')}-01`);
                     } catch (e) {
                       return new Date();
                     }

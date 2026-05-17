@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -38,7 +38,7 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.title}>SaudePet</Text>
 
         <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>email</Text>
           <TextInput
             style={styles.input}
             placeholder="seu melhor email"
@@ -49,7 +49,7 @@ const LoginScreen = ({ navigation }) => {
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>Senha</Text>
+          <Text style={styles.label}>senha</Text>
           <TextInput
             style={styles.input}
             placeholder="senha super secreta"

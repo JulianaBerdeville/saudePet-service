@@ -187,9 +187,9 @@ const HomeScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         {
           userName ?
-            <Text style={styles.title}> Bem vinda(o),<Text style={styles.name}> {`${userName}` || ''} </Text></Text>
+            <Text style={styles.title}> bem vinda(o),<Text style={styles.name}> {`${userName}` || ''} </Text></Text>
             :
-            <Text style={styles.title}> Bem vinda(o)!</Text>
+            <Text style={styles.title}> bem vinda(o)!</Text>
         }
       </View>
 
